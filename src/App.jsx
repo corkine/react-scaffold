@@ -3,7 +3,7 @@ import { Button, Tooltip } from 'antd'
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectCount, increment, decrement } from './reducer/counter';
-import { logout, userSelector } from './reducer/user';
+import { useAuth } from './reducer/user';
 
 export function About() {
   const dispatch = useDispatch()
@@ -66,10 +66,9 @@ function Footer() {
 function App() {
   const [count, setCount] = useState(0)
   const dispatch = useDispatch()
-  const { noAuth } = useSelector(userSelector)
+  const { user } = useAuth();
   return (
     <>
-      {noAuth && <Navigate to="/login" />}
       <Header />
       <Hero />
       <Stat />
@@ -151,8 +150,7 @@ function Card() {
 }
 
 function Header() {
-  const dispatch = useDispatch()
-  const { username } = useSelector(userSelector)
+  const { user: username, logout } = useAuth()
   const nav = useNavigate()
   return (
     <div className="navbar bg-base-100">
@@ -178,7 +176,7 @@ function Header() {
           <li>
             <Tooltip title={username ? "点击登出" : "点击登录"}>
               <a onClick={username ? () => {
-                dispatch(logout())
+                logout()
                 //nav("/login")
               }
                 : () => nav("/login")}>{username ?? "登录"}</a>

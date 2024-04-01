@@ -1,47 +1,49 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App, { About } from './App.jsx'
-import './index.css'
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import { Provider, useDispatch } from 'react-redux'
-import counter from './reducer/counter.js';
-import user, { recover } from './reducer/user.js';
+import { BrowserRouter, useRoutes } from "react-router-dom";
 import { configureStore } from '@reduxjs/toolkit';
+import { Provider } from 'react-redux'
+
+import counter from './reducer/counter.js';
+import { usePrepareAuth, AuthContext } from './reducer/user.js';
+
+import App, { About } from './App.jsx'
 import Login from './login.jsx';
+
+import './index.css'
 
 const store = configureStore({
   reducer: {
-    counter,
-    user
+    counter
   }
 })
 
-const router = createBrowserRouter([
+const router = [
   {
-    path: "/",
+    path: "",
     element: <App />
   },
   {
-    path: "/about",
+    path: "about",
     element: <About />,
   },
   {
-    path: "/login",
+    path: "login",
     element: <Login />
   }
-]);
+];
 
 function Root() {
-  const dispatch = useDispatch()
-  useEffect(() => {
-    dispatch(recover())
-  }, [])
-  return <RouterProvider router={router} />;
+  const u = usePrepareAuth();
+  return (
+    <AuthContext.Provider value={u}>
+      {useRoutes(router)}
+    </AuthContext.Provider>
+  )
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<Provider store={store}>
-  <Root />
+  <BrowserRouter>
+    <Root />
+  </BrowserRouter>
 </Provider>)

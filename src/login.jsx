@@ -1,29 +1,25 @@
-import { useDispatch, useSelector } from "react-redux"
-import { login, userSelector } from "./reducer/user"
-import { useEffect, useRef } from "react"
-import { Alert, message } from "antd"
-import { Navigate } from "react-router-dom"
+import { useAuth } from "./reducer/user"
+import { useRef } from "react"
+import { message } from "antd"
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-    const dp = useDispatch()
-    const {noAuth, resultMessage} = useSelector(userSelector)
+    const { login } = useAuth();
+    const nav = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
-    useEffect(() => {
-        if (resultMessage !== null) {
-            messageApi.info(resultMessage)
-        }
-    }, [resultMessage])
     const u = useRef()
     const p = useRef()
     function handleLogin(e) {
+        e.preventDefault()
         const u2 = u.current.value
         const p2 = p.current.value
         if (!u2 || !p2) {
             messageApi.error("用户名或密码不能为空")
         } else {
-            dp(login(u2, p2))
+            messageApi.success("登录成功")
+            login(u2, p2)
+            nav("/")
         }
-        e.preventDefault()
     }
 
     return <div className="hero min-h-screen bg-base-200">
@@ -52,7 +48,6 @@ export default function Login() {
                             <a href="#" className="label-text-alt link link-hover">忘记密码</a>
                         </label>
                     </div>
-                    {!noAuth && <Navigate to='/' />}
                     <div className="form-control mt-6">
                         <button className="btn btn-primary"
                             onClick={handleLogin}>登录</button>
